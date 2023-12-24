@@ -18,7 +18,7 @@ namespace OpenSlots
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             //_graphics.IsFullScreen = true;
-            _graphics.PreferredBackBufferWidth = 1440;
+            _graphics.PreferredBackBufferWidth = 720;
             _graphics.PreferredBackBufferHeight = 900;
             IsMouseVisible = true;
 
@@ -28,6 +28,7 @@ namespace OpenSlots
 
         protected override void Initialize()
         {
+            Window.Position = new Point(0, 0);
             base.Initialize();
             LoadScreen1();
         }

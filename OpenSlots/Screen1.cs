@@ -49,9 +49,9 @@ namespace OpenSlots
         public bool LineDownPressed = false;
         public bool LongSpinStarted = false;
 
-        public int Credits = 100;
-        public int Bet = 1;
-        public int Lines = 1;
+        public int Credits = 1000;
+        public int Bet = 10;
+        public int Lines = 3;
         public int LastWinAmount = 0;
         public int FreeSpins = 0;
         public bool OnFreeSpin = false;
@@ -71,7 +71,7 @@ namespace OpenSlots
         {
             _graphics = Game._graphics;
             Content.RootDirectory = "Content";
-            _graphics.ToggleFullScreen();
+            //_graphics.ToggleFullScreen();
             Game.IsMouseVisible = true;
         }
 
@@ -88,7 +88,8 @@ namespace OpenSlots
             Overlay = Content.Load<Texture2D>("Overlay");
 
             int ReelWidth = (int)(GraphicsDevice.Viewport.Width / 5.0f);
-            Reels.Add(new Reel(new Rectangle(120, 0, ReelWidth, GraphicsDevice.Viewport.Height), new List<Reel.Tokens> {
+            int ReelPadding = (int)(GraphicsDevice.Viewport.Width * 0.0833333f);
+            Reels.Add(new Reel(new Rectangle(ReelPadding, GraphicsDevice.Viewport.Height / 2, ReelWidth, GraphicsDevice.Viewport.Height / 2), new List<Reel.Tokens> {
                 luckyDuck,
                 seven,
                 bar,
@@ -130,7 +131,7 @@ namespace OpenSlots
                 luckyDuck,
                 bar
             }, this, 1));
-            Reels.Add(new Reel(new Rectangle(GraphicsDevice.Viewport.Width / 2 - (ReelWidth / 2) - 5, 0, ReelWidth, GraphicsDevice.Viewport.Height), new List<Reel.Tokens> {
+            Reels.Add(new Reel(new Rectangle(GraphicsDevice.Viewport.Width / 2 - (ReelWidth / 2) - 5, GraphicsDevice.Viewport.Height / 2, ReelWidth, GraphicsDevice.Viewport.Height / 2), new List<Reel.Tokens> {
                 luckyDuck,
                 tripleBar,
                 bar,
@@ -172,7 +173,7 @@ namespace OpenSlots
                 luckyDuck,
                 bar
             }, this, 2));
-            Reels.Add(new Reel(new Rectangle(GraphicsDevice.Viewport.Width - (ReelWidth + 135), 0, ReelWidth, GraphicsDevice.Viewport.Height), new List<Reel.Tokens> {
+            Reels.Add(new Reel(new Rectangle(GraphicsDevice.Viewport.Width - (ReelWidth + (int)(ReelPadding * 1.125f)), GraphicsDevice.Viewport.Height / 2, ReelWidth, GraphicsDevice.Viewport.Height / 2), new List<Reel.Tokens> {
                 luckyDuck,
                 tripleBar,
                 bar,
@@ -253,7 +254,7 @@ namespace OpenSlots
             PayTables.Add(new PayTable(new Reel.Tokens[] { tripleBar, tripleBar, doubleBar }, anyBarMultiplier));
             #endregion
 
-            TimeToNextFreeCredit = DateTime.Now.AddMinutes(30);
+            TimeToNextFreeCredit = DateTime.Now.AddMinutes(60);
             CurrentState = GameState.InGame;
             base.Initialize();
         }
@@ -270,6 +271,7 @@ namespace OpenSlots
             ml.Tokens.Add(Reel.Tokens.LuckyDuck, Content.Load<Texture2D>("luckyduck"));
 
             ml.Backgrounds.Add("bg", Content.Load<Texture2D>("bg"));
+            ml.Backgrounds.Add("duckpond", Content.Load<Texture2D>("duckpond"));
 
             ml.Images.Add("bigwinboard", Content.Load<Texture2D>("Big Win Board"));
             ml.Images.Add("smallwinboard", Content.Load<Texture2D>("Small Win Board"));
@@ -309,7 +311,8 @@ namespace OpenSlots
                 reel.Draw(_spriteBatch);
             }
 
-            _spriteBatch.Draw(ml.Backgrounds["bg"], GraphicsDevice.Viewport.Bounds, Color.White);
+            _spriteBatch.Draw(ml.Backgrounds["bg"], new Rectangle(0, GraphicsDevice.Viewport.Bounds.Height / 2, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Bounds.Height / 2), Color.White);
+            _spriteBatch.Draw(ml.Backgrounds["duckpond"], new Rectangle(0, 0, GraphicsDevice.Viewport.Bounds.Width, GraphicsDevice.Viewport.Bounds.Height / 2), Color.White);
 
             if (FreeSpins > 0 || OnFreeSpin)
             {
@@ -545,7 +548,7 @@ namespace OpenSlots
                     Game.Exit();
 
                 //Change the bet
-                if (Keyboard.GetState().IsKeyDown(Keys.Up) && !Spinning)
+                if ((GamePad.GetState(0).Buttons.LeftShoulder == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Up)) && !Spinning)
                 {
                     if (!BetUpPressed)
                     {
@@ -565,7 +568,7 @@ namespace OpenSlots
                 }
                 else
                     BetUpPressed = false;
-                if (Keyboard.GetState().IsKeyDown(Keys.Down) && !Spinning)
+                if ((GamePad.GetState(0).Buttons.RightShoulder == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Down)) && !Spinning)
                 {
                     if (!BetDownPressed)
                     {
@@ -587,7 +590,7 @@ namespace OpenSlots
                     BetDownPressed = false;
 
                 //Change the paylines
-                if (Keyboard.GetState().IsKeyDown(Keys.NumPad8) && !Spinning && Lines < 5)
+                if ((GamePad.GetState(0).Buttons.Start == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.NumPad8)) && !Spinning && Lines < 5)
                 {
                     if (!LineUpPressed)
                     {
@@ -598,7 +601,7 @@ namespace OpenSlots
                 }
                 else
                     LineUpPressed = false;
-                if (Keyboard.GetState().IsKeyDown(Keys.NumPad2) && !Spinning && Lines > 1)
+                if ((GamePad.GetState(0).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.NumPad2)) && !Spinning && Lines > 1)
                 {
                     if (!LineDownPressed)
                     {

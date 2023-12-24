@@ -78,6 +78,7 @@ namespace OpenSlots
             }
             else if (WheelRotation % 1 != 0) // Check if wheel needs to be aligned
             {
+                spinVelocity = 0.17f;
                 // Calculate the fractional part of WheelRotation
                 float fractionalPart = WheelRotation % 1;
 
@@ -218,6 +219,22 @@ namespace OpenSlots
                         if (i == 1)
                             draw = true ? true : false;
                     }
+                }
+
+                if (Wheel[tokenIndex] == Tokens.LuckyDuck)
+                {
+                    double time = DateTime.Now.Millisecond / 1000.0; // Convert milliseconds to seconds
+                    double wave = Math.Cos(2 * Math.PI * time); // Complete a cycle every second
+
+                    // Adjust the wave's amplitude and offset to suit your needs
+                    int amplitude = 25; // Example amplitude value
+                    wave *= amplitude; // Scale the wave
+
+                    // Apply the wave pattern to modify the rectangle's properties
+                    destinationRect.X -= (int)(wave / 2);
+                    destinationRect.Y -= (int)(wave / 2);
+                    destinationRect.Width += (int)wave;
+                    destinationRect.Height += (int)wave;
                 }
 
                 if (draw)
